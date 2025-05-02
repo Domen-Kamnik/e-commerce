@@ -1,5 +1,5 @@
 @import "tailwindcss";
 
 body {
-  @apply bg-linear-to-b from-cyan-600 to-cyan-800 h-[100vh];
+  @apply bg-linear-to-b from-[#feefd1] to-[#fad895] h-[100vh];
 }
