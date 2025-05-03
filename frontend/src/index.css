@@ -3,3 +3,7 @@
 body {
   @apply bg-linear-to-b from-[#feefd1] to-[#fad895] h-[100vh];
 }
+
+.error {
+  @apply w-full my-1 p-2 bg-red-200 border-red-400 text-red-500 text-center font-semibold rounded;
+}
