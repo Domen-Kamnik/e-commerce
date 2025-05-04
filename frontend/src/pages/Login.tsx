@@ -2,23 +2,30 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import logo from "../assets/logo.png";
 import { constants } from "../constants/constants";
+import { LoginResponseData, LoginResponseError } from "../DTO/responseDTO";
+import { setAccessToken } from "../hooks/useFetch";
+import { useUser } from "../context/UserProvider";
 
 function Login() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setPending(true);
-    const response = await fetch(`${constants.BASE_URL}/login`, {
+    const response = await fetch(`${constants.BASE_URL}/auth/login`, {
       method: "POST",
       credentials: "include",
-      headers: { "Content-type": "applicaion/json" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
+    setPending(false);
     if (response.ok) {
-      const data = await response.json();
+      const data: LoginResponseData = await response.json();
+      setAccessToken(data.accessToken);
+      setUser({ name: data.name, email });
       navigate("/");
     } else {
-      setError({});
+      const error: LoginResponseError = await response.json();
+      setError(error);
     }
   }
   const [email, setEmail] = useState("");
@@ -26,6 +33,7 @@ function Login() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<Record<string, string> | null>(null);
+  const { setUser } = useUser();
   const navigate = useNavigate();
   return (
     <div className="mx-auto mt-6 max-w-md bg-white rounded-sm border border-gray-300 shadow-xl">

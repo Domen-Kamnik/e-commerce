@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import client from "../data/prismaClient";
+import prisma from "../data/prismaClient";
 import * as JWT from "jsonwebtoken";
 import { hashSync, compareSync } from "bcryptjs";
 
@@ -12,7 +12,7 @@ export async function register(req: Request, res: Response) {
   }
   let { email, password, name } = req.body;
   name = name.trim();
-  const existingUser = await client.user.findFirst({
+  const existingUser = await prisma.user.findFirst({
     where: { OR: [{ email }, { name }] },
   });
   if (existingUser) {
@@ -23,15 +23,41 @@ export async function register(req: Request, res: Response) {
     res.status(400).json({ errors });
     return;
   }
-  const user = await client.user.create({
+  const user = await prisma.user.create({
     data: { email, name, password: hashSync(password, 10) },
   });
+  const accessToken = createAccessToken(user);
+  setRefreshToken(user, res);
+  res.json({ accessToken });
+}
 
+export async function login(req: Request, res: Response) {
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    res.status(400).json({ errors: result.array() });
+    return;
+  }
+  const { email, password } = req.body;
+  const user = await prisma.user.findFirst({ where: { email } });
+  if (!user || !compareSync(password, user.password)) {
+    res.status(403).json({ errors: { "Incorrect credentials": true } });
+    return;
+  }
+  const accessToken = createAccessToken(user);
+  setRefreshToken(user, res);
+  res.json({ accessToken, name: user.name });
+}
+
+function createAccessToken(user: any) {
   const accessToken = JWT.sign(
-    { id: user.id },
+    { id: user.id as number },
     process.env.ACCESS_TOKEN_SECRET as string,
     { expiresIn: 60 * 10 }
   );
+  return accessToken;
+}
+
+function setRefreshToken(user: any, res: Response) {
   const expiresIn = 86400 * 7 * 2;
   const refreshToken = JWT.sign(
     { id: user.id },
@@ -43,5 +69,5 @@ export async function register(req: Request, res: Response) {
     path: "/refresh",
     httpOnly: true,
   });
-  res.json({ accessToken });
+  return refreshToken;
 }

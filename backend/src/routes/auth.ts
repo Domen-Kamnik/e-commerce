@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register } from "../controllers/authController";
+import { login, register } from "../controllers/authController";
 import { body, query } from "express-validator";
 
 const authRoutes: Router = Router();
@@ -12,6 +12,12 @@ authRoutes.post(
     body("name").notEmpty().trim().isLength({ min: 6 }),
   ],
   register
+);
+
+authRoutes.post(
+  "/login",
+  [body("email").notEmpty().isEmail(), body("password").notEmpty()],
+  login
 );
 
 export default authRoutes;
