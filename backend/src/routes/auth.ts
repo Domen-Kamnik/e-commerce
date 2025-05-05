@@ -1,15 +1,22 @@
 import { Router } from "express";
 import { login, register } from "../controllers/authController";
-import { body, query } from "express-validator";
+import { body, check, query } from "express-validator";
 
 const authRoutes: Router = Router();
 
 authRoutes.post(
   "/register",
   [
-    body("email").notEmpty().isEmail(),
-    body("password").notEmpty().isLength({ min: 8 }),
-    body("name").notEmpty().trim().isLength({ min: 6 }),
+    check("email")
+      .notEmpty()
+      .withMessage("Email is required")
+      .isEmail()
+      .withMessage("Not a valid email address"),
+    check("password")
+      .notEmpty()
+      .withMessage("Password required")
+      .isLength({ min: 8 }),
+    check("name").notEmpty().trim().isLength({ min: 6 }),
   ],
   register
 );

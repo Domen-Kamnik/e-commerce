@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import logo from "../assets/logo.png";
 import { constants } from "../constants/constants";
-import { LoginResponseData, LoginResponseError } from "../DTO/responseDTO";
+import { LoginResponseDTO, LoginResponseError } from "../DTO/responseDTO";
 import { setAccessToken } from "../hooks/useFetch";
 import { useUser } from "../context/UserProvider";
+import { User } from "../types/types";
 
 function Login() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -19,9 +20,11 @@ function Login() {
     });
     setPending(false);
     if (response.ok) {
-      const data: LoginResponseData = await response.json();
+      const data: LoginResponseDTO = await response.json();
       setAccessToken(data.accessToken);
-      setUser({ name: data.name, email });
+      const user: User = { name: data.name, email };
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
       navigate("/");
     } else {
       const error: LoginResponseError = await response.json();
@@ -85,7 +88,7 @@ function Login() {
         {error && <div className="error">{error.message}</div>}
 
         <div className="w-full text-blue-500 hover:text-blue-700 transition-colors text-md text-right">
-          <Link to={"/register"}>Create a new account</Link>
+          <Link to={"/register"}>Create a free account</Link>
         </div>
         <button
           className={` mt-2 mx-auto block px-4 py-2 text-white text-xl font-semibold border ${

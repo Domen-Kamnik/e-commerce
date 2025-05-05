@@ -7,7 +7,7 @@ import { hashSync, compareSync } from "bcryptjs";
 export async function register(req: Request, res: Response) {
   const result = validationResult(req);
   if (!result.isEmpty()) {
-    res.status(400).json({ errors: result.array() });
+    res.status(400).json(result.array());
     return;
   }
   let { email, password, name } = req.body;
@@ -16,11 +16,10 @@ export async function register(req: Request, res: Response) {
     where: { OR: [{ email }, { name }] },
   });
   if (existingUser) {
-    const errors: Record<string, string>[] = [];
-    if (existingUser.email === email)
-      errors.push({ msg: "taken", path: "email" });
-    if (existingUser.name === name) errors.push({ msg: "taken", path: "name" });
-    res.status(400).json({ errors });
+    const errors: Record<string, boolean> = { email: false, name: false };
+    if (existingUser.email === email) errors["email"] = true;
+    if (existingUser.name === name) errors["name"] = true;
+    res.status(400).json(errors);
     return;
   }
   const user = await prisma.user.create({
@@ -40,7 +39,7 @@ export async function login(req: Request, res: Response) {
   const { email, password } = req.body;
   const user = await prisma.user.findFirst({ where: { email } });
   if (!user || !compareSync(password, user.password)) {
-    res.status(403).json({ errors: { "Incorrect credentials": true } });
+    res.status(403).json({ message: "Incorrect credentials" });
     return;
   }
   const accessToken = createAccessToken(user);
