@@ -1,10 +1,23 @@
-import { createContext, ReactNode, useContext, useState } from "react";
-import { User, UserContextType } from "../types/types";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { User, UserContextType } from "../types/domain/user";
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  useEffect(() => {
+    const userItem = localStorage.getItem("user");
+    if (userItem) {
+      const user: User = JSON.parse(userItem);
+      setUser(user);
+    }
+  }, []);
   return (
     <UserContext.Provider value={{ user, setUser }}>
       {children}

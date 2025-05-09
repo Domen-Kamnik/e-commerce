@@ -1,10 +1,12 @@
-import Search from "./Search";
-import logo from "../assets/logo.png";
+import Search from "../Search";
+import logo from "../../assets/logo.png";
 import { Link } from "react-router";
-import { useUser } from "../context/UserProvider";
+import { useUser } from "../../context/UserProvider";
+import UserDropdown from "./UserDropdown";
 
 function Navbar() {
   const { user } = useUser();
+
   return (
     <nav className="relative flex p-2 bg-gray-900">
       <ul className="flex flex-col w-full font-sans text-lg text-gray-200 gap-2 sm:flex-row sm:items-center sm:gap-6">
@@ -38,6 +40,7 @@ function Navbar() {
             </Link>
           </li>
         )}
+        {user && <UserDropdown />}
       </ul>
     </nav>
   );

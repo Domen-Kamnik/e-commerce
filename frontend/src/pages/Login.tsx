@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import logo from "../assets/logo.png";
 import { constants } from "../constants/constants";
-import { LoginResponseDTO, LoginResponseError } from "../DTO/responseDTO";
+import { LoginResponseDTO, LoginResponseError } from "../types/dto/responseDTO";
 import { setAccessToken } from "../hooks/useFetch";
 import { useUser } from "../context/UserProvider";
-import { User } from "../types/types";
+import { User } from "../types/domain/user";
 
 function Login() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

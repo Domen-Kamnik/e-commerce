@@ -3,8 +3,8 @@ import { constants } from "../constants/constants";
 import {
   RegistrationResponseDTO,
   RegistrationResponseError,
-} from "../DTO/responseDTO";
-import { User } from "../types/types";
+} from "../types/dto/responseDTO";
+import { User } from "../types/domain/user";
 import { setAccessToken } from "../hooks/useFetch";
 import { useState } from "react";
 import { useUser } from "../context/UserProvider";
